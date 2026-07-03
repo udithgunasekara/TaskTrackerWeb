@@ -1,0 +1,20 @@
+# Maven
+target/
+*.iml
+.mvn/
+
+# Node
+node_modules/
+dist/
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Backend config
+backend/src/main/resources/application-dev.properties
+Backend/src/main/resources/application-dev.properties
