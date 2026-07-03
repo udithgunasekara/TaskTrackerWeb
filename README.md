@@ -145,4 +145,17 @@ You can explore the endpoints by importing the Postman collection located in the
 - Complete E2E testing with Playwright or Cypress.
 
 ## Deployment
-*(Filled in during the Dockerization phase)*
+We provide a complete Dockerized setup using `docker-compose`.
+
+1. Ensure Docker and Docker Compose are installed.
+2. From the root directory, run:
+   ```bash
+   docker-compose up -d --build
+   ```
+3. The application will be available at:
+   - Frontend: `http://localhost:80`
+   - Backend API: `http://localhost:8082/api/v1`
+
+### Images:
+- **Backend**: Uses a multi-stage build (`maven` -> `eclipse-temurin:17-jre`) to produce and run the jar.
+- **Frontend**: Uses a multi-stage build (`node:20` -> `nginx:alpine`) to build the static React bundle and serve it via Nginx, which also proxies `/api` and `/ws` requests to the backend.
