@@ -1,5 +1,5 @@
 import api from '../lib/axios';
-import { PageResponse, Task, TaskRequest } from '../types/api';
+import type { PageResponse, Task, TaskRequest } from '../types/api';
 
 export const getTasks = async (page = 0, size = 10): Promise<PageResponse<Task>> => {
   const response = await api.get<PageResponse<Task>>(`/api/tasks?page=${page}&size=${size}`);
