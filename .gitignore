@@ -18,3 +18,6 @@ dist/
 # Backend config
 backend/src/main/resources/application-dev.properties
 Backend/src/main/resources/application-dev.properties
+
+# Docs
+task-tracker-implementation-guide (2).md
