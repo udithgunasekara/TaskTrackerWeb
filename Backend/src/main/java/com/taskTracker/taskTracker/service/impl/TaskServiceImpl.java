@@ -20,12 +20,17 @@ public class TaskServiceImpl implements TaskService {
   private final TaskRepository taskRepository;
   private final UserRepository userRepository;
   private final TaskMapper taskMapper;
+  private final com.taskTracker.taskTracker.event.TaskEventPublisher taskEventPublisher;
 
   public TaskServiceImpl(
-      TaskRepository taskRepository, UserRepository userRepository, TaskMapper taskMapper) {
+      TaskRepository taskRepository,
+      UserRepository userRepository,
+      TaskMapper taskMapper,
+      com.taskTracker.taskTracker.event.TaskEventPublisher taskEventPublisher) {
     this.taskRepository = taskRepository;
     this.userRepository = userRepository;
     this.taskMapper = taskMapper;
+    this.taskEventPublisher = taskEventPublisher;
   }
 
   @Override
@@ -37,7 +42,10 @@ public class TaskServiceImpl implements TaskService {
     task.setOwner(user);
 
     Task savedTask = taskRepository.save(task);
-    return taskMapper.toResponse(savedTask);
+    TaskResponse response = taskMapper.toResponse(savedTask);
+    taskEventPublisher.publishEvent(
+        com.taskTracker.taskTracker.event.TaskEventType.CREATED, response);
+    return response;
   }
 
   @Override
@@ -82,7 +90,10 @@ public class TaskServiceImpl implements TaskService {
     taskMapper.updateEntity(request, task);
     Task updatedTask = taskRepository.save(task);
 
-    return taskMapper.toResponse(updatedTask);
+    TaskResponse response = taskMapper.toResponse(updatedTask);
+    taskEventPublisher.publishEvent(
+        com.taskTracker.taskTracker.event.TaskEventType.UPDATED, response);
+    return response;
   }
 
   @Override
@@ -95,6 +106,9 @@ public class TaskServiceImpl implements TaskService {
                     new com.taskTracker.taskTracker.exception.ResourceNotFoundException(
                         "Task", taskId));
 
+    TaskResponse response = taskMapper.toResponse(task);
     taskRepository.delete(task);
+    taskEventPublisher.publishEvent(
+        com.taskTracker.taskTracker.event.TaskEventType.DELETED, response);
   }
 }
