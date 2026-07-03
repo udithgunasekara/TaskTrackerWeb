@@ -25,11 +25,15 @@ public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthFilter;
   private final UserDetailsService userDetailsService;
+  private final com.taskTracker.taskTracker.security.RestAuthEntryPoint restAuthEntryPoint;
 
   public SecurityConfig(
-      JwtAuthenticationFilter jwtAuthFilter, UserDetailsService userDetailsService) {
+      JwtAuthenticationFilter jwtAuthFilter,
+      UserDetailsService userDetailsService,
+      com.taskTracker.taskTracker.security.RestAuthEntryPoint restAuthEntryPoint) {
     this.jwtAuthFilter = jwtAuthFilter;
     this.userDetailsService = userDetailsService;
+    this.restAuthEntryPoint = restAuthEntryPoint;
   }
 
   @Bean
@@ -47,6 +51,7 @@ public class SecurityConfig {
                     .authenticated())
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .exceptionHandling(e -> e.authenticationEntryPoint(restAuthEntryPoint))
         .authenticationProvider(authenticationProvider())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

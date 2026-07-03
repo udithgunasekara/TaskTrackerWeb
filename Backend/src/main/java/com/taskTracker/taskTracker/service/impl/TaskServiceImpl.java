@@ -58,7 +58,10 @@ public class TaskServiceImpl implements TaskService {
     Task task =
         taskRepository
             .findByIdAndOwnerId(taskId, userId)
-            .orElseThrow(() -> new RuntimeException("Task not found or forbidden"));
+            .orElseThrow(
+                () ->
+                    new com.taskTracker.taskTracker.exception.ResourceNotFoundException(
+                        "Task", taskId));
 
     taskMapper.updateEntity(request, task);
     Task updatedTask = taskRepository.save(task);
@@ -71,7 +74,10 @@ public class TaskServiceImpl implements TaskService {
     Task task =
         taskRepository
             .findByIdAndOwnerId(taskId, userId)
-            .orElseThrow(() -> new RuntimeException("Task not found or forbidden"));
+            .orElseThrow(
+                () ->
+                    new com.taskTracker.taskTracker.exception.ResourceNotFoundException(
+                        "Task", taskId));
 
     taskRepository.delete(task);
   }

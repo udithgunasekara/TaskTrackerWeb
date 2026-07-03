@@ -35,7 +35,8 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public AuthResponse register(RegisterRequest request) {
     if (userRepository.existsByEmail(request.email())) {
-      throw new RuntimeException("Email already in use");
+      throw new com.taskTracker.taskTracker.exception.DuplicateEmailException(
+          "Email already in use");
     }
 
     User user =
@@ -61,7 +62,10 @@ public class AuthServiceImpl implements AuthService {
     User user =
         userRepository
             .findByEmail(request.email())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(
+                () ->
+                    new org.springframework.security.authentication.BadCredentialsException(
+                        "Invalid email or password"));
 
     String token = jwtUtil.generateToken(user);
     return new AuthResponse(
