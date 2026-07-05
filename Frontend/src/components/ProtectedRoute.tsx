@@ -1,12 +1,9 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { useRealtime } from '../hooks/useRealtime';
 import Navbar from './Navbar';
 
 export default function ProtectedRoute() {
   const token = useAuthStore((state) => state.token);
-  
-  useRealtime();
 
   if (!token) {
     return <Navigate to="/login" replace />;

@@ -14,6 +14,7 @@ import com.taskTracker.taskTracker.security.JwtAuthenticationFilter;
 import com.taskTracker.taskTracker.security.JwtUtil;
 import com.taskTracker.taskTracker.security.RestAuthEntryPoint;
 import com.taskTracker.taskTracker.service.TaskService;
+import com.taskTracker.taskTracker.support.WithMockCustomUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,7 +22,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(TaskController.class)
@@ -39,7 +39,7 @@ class TaskControllerTest {
   @MockBean private RestAuthEntryPoint restAuthEntryPoint;
 
   @Test
-  @WithMockUser
+  @WithMockCustomUser
   void createTask_ValidInput_Returns200() throws Exception {
     TaskRequest request = new TaskRequest("Test Title", "Desc", TaskStatus.TODO, null);
     TaskResponse response =
@@ -57,7 +57,7 @@ class TaskControllerTest {
   }
 
   @Test
-  @WithMockUser
+  @WithMockCustomUser
   void createTask_InvalidInput_Returns400() throws Exception {
     TaskRequest request = new TaskRequest("", "Desc", TaskStatus.TODO, null); // invalid blank title
 

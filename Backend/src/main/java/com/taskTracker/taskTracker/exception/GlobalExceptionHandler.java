@@ -19,6 +19,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+  private static final org.slf4j.Logger log =
+      org.slf4j.LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleValidationExceptions(
       MethodArgumentNotValidException ex, HttpServletRequest request) {
@@ -130,6 +133,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleAllOtherExceptions(
       Exception ex, HttpServletRequest request) {
+    log.error("Unhandled exception on {} {}", request.getMethod(), request.getRequestURI(), ex);
     ErrorResponse response =
         new ErrorResponse(
             Instant.now(),
@@ -138,7 +142,6 @@ public class GlobalExceptionHandler {
             "An unexpected error occurred",
             request.getRequestURI(),
             null);
-    // Log the exception in a real application
     return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

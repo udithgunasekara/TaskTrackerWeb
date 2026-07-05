@@ -7,7 +7,6 @@ import com.taskTracker.taskTracker.dto.response.TaskResponse;
 import com.taskTracker.taskTracker.entity.Role;
 import com.taskTracker.taskTracker.entity.Task;
 import com.taskTracker.taskTracker.entity.User;
-import com.taskTracker.taskTracker.event.TaskEventPublisher;
 import com.taskTracker.taskTracker.exception.ResourceNotFoundException;
 import com.taskTracker.taskTracker.mapper.TaskMapper;
 import com.taskTracker.taskTracker.repository.TaskRepository;
@@ -26,7 +25,6 @@ class TaskServiceImplTest {
   @Mock private TaskRepository taskRepository;
   @Mock private UserRepository userRepository;
   @Mock private TaskMapper taskMapper;
-  @Mock private TaskEventPublisher taskEventPublisher;
 
   @InjectMocks private TaskServiceImpl taskService;
 
@@ -68,8 +66,6 @@ class TaskServiceImplTest {
 
     assertNotNull(result);
     verify(taskMapper).updateEntity(request, task);
-    verify(taskEventPublisher)
-        .publishEvent(eq(com.taskTracker.taskTracker.event.TaskEventType.UPDATED), any());
   }
 
   @Test

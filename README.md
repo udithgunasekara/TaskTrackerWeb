@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/udithgunasekara/TaskTrackerWeb/actions/workflows/ci.yml/badge.svg)
 
-Task Tracker is a full-stack, real-time web application for managing tasks across a team. It provides robust JWT-based authentication, Role-Based Access Control (RBAC), and instantaneous real-time UI updates across connected clients using WebSockets.
+Task Tracker is a full-stack web application for managing tasks across a team. It provides robust JWT-based authentication and Role-Based Access Control (RBAC), with a React frontend that keeps the task list in sync after every change.
 
 ## Tech Stack
 
@@ -13,7 +13,6 @@ Task Tracker is a full-stack, real-time web application for managing tasks acros
 | **Database** | MySQL 8 | Relational data persistence with robust ACID guarantees. |
 | **Data Access** | Spring Data JPA / Hibernate | Reduces boilerplate database querying and ORM management. |
 | **Security** | Spring Security + JWT | Stateless, secure authentication that scales without server sessions. |
-| **Real-time** | Spring WebSocket (STOMP) | Provides pub/sub messaging channels over WebSockets for live UI updates. |
 | **Frontend Framework** | React 18 (Vite) | Lightning fast HMR and optimized production builds. |
 | **State Management** | TanStack Query + Zustand | Query for server-state caching; Zustand for global client-state (Auth/Toasts). |
 | **Styling** | Tailwind CSS v4 | Utility-first CSS for rapid, responsive UI development. |
@@ -22,21 +21,17 @@ Task Tracker is a full-stack, real-time web application for managing tasks acros
 ## Architecture Overview
 
 **Package Layout:**
-- `controller`: REST endpoints & STOMP controllers
+- `controller`: REST endpoints
 - `service`: Business logic interfaces and implementations (`impl`)
 - `repository`: Spring Data JPA interfaces
 - `entity`: Database models
 - `dto`: Data Transfer Objects (Requests & Responses)
 - `security`: JWT filters, authentication providers, user details
-- `config`: Beans configuration (Security, WebSockets)
-- `event`: Application event publishers and listeners
+- `config`: Beans configuration (Security)
 - `exception`: Global exception handler and custom exceptions
 
 **Request Flow:**  
 `Client` → `Controller` → `Service` → `Repository` → `MySQL`
-
-**WebSocket Flow:**  
-`Service` → `EventPublisher` → `STOMP Broker` → `STOMP Topics/Queues` → `Client`
 
 ## Getting Started
 
@@ -98,13 +93,9 @@ Upon backend startup, an admin account is automatically seeded if it doesn't exi
 
 You can explore the endpoints by importing the Postman collection located in the `/postman` folder into your Postman workspace.
 
-## Real-Time Design
-- **Authentication:** STOMP connections are secured by passing the JWT in the `CONNECT` frame.
-- **Channels:** 
-  - `/user/queue/tasks`: Users subscribe to this to receive updates about their own tasks.
-  - `/topic/admin/tasks`: Admins subscribe to this to receive updates about ALL tasks across the system.
-- **Admin Verification:** The system verifies the user's role at the time of subscription to prevent unauthorized access to the admin topic.
-- **Duplicate Prevention:** Admins receive messages on BOTH channels. Duplicate handling is managed gracefully by TanStack Query's automated deduplication and invalidation logic.
+## Keeping the UI in Sync
+- After a create, update, or delete succeeds, the frontend invalidates the relevant TanStack Query cache keys (`['tasks']` and `['task', id]`), which triggers an automatic refetch so the list and detail views show the latest data.
+- A short-lived toast confirms each action so the user gets immediate feedback.
 
 ## Design Decisions
 - **MapStruct:** Used for robust, compile-time type-safe DTO mapping.
@@ -158,4 +149,4 @@ We provide a complete Dockerized setup using `docker-compose`.
 
 ### Images:
 - **Backend**: Uses a multi-stage build (`maven` -> `eclipse-temurin:17-jre`) to produce and run the jar.
-- **Frontend**: Uses a multi-stage build (`node:20` -> `nginx:alpine`) to build the static React bundle and serve it via Nginx, which also proxies `/api` and `/ws` requests to the backend.
+- **Frontend**: Uses a multi-stage build (`node:20` -> `nginx:alpine`) to build the static React bundle and serve it via Nginx, which also proxies `/api` requests to the backend.

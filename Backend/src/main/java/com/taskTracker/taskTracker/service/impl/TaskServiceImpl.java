@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -20,17 +21,12 @@ public class TaskServiceImpl implements TaskService {
   private final TaskRepository taskRepository;
   private final UserRepository userRepository;
   private final TaskMapper taskMapper;
-  private final com.taskTracker.taskTracker.event.TaskEventPublisher taskEventPublisher;
 
   public TaskServiceImpl(
-      TaskRepository taskRepository,
-      UserRepository userRepository,
-      TaskMapper taskMapper,
-      com.taskTracker.taskTracker.event.TaskEventPublisher taskEventPublisher) {
+      TaskRepository taskRepository, UserRepository userRepository, TaskMapper taskMapper) {
     this.taskRepository = taskRepository;
     this.userRepository = userRepository;
     this.taskMapper = taskMapper;
-    this.taskEventPublisher = taskEventPublisher;
   }
 
   @Override
@@ -42,13 +38,11 @@ public class TaskServiceImpl implements TaskService {
     task.setOwner(user);
 
     Task savedTask = taskRepository.save(task);
-    TaskResponse response = taskMapper.toResponse(savedTask);
-    taskEventPublisher.publishEvent(
-        com.taskTracker.taskTracker.event.TaskEventType.CREATED, response);
-    return response;
+    return taskMapper.toResponse(savedTask);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public PageResponse<TaskResponse> getTasks(
       com.taskTracker.taskTracker.entity.TaskStatus status,
       Long ownerId,
@@ -90,10 +84,7 @@ public class TaskServiceImpl implements TaskService {
     taskMapper.updateEntity(request, task);
     Task updatedTask = taskRepository.save(task);
 
-    TaskResponse response = taskMapper.toResponse(updatedTask);
-    taskEventPublisher.publishEvent(
-        com.taskTracker.taskTracker.event.TaskEventType.UPDATED, response);
-    return response;
+    return taskMapper.toResponse(updatedTask);
   }
 
   @Override
@@ -106,9 +97,6 @@ public class TaskServiceImpl implements TaskService {
                     new com.taskTracker.taskTracker.exception.ResourceNotFoundException(
                         "Task", taskId));
 
-    TaskResponse response = taskMapper.toResponse(task);
     taskRepository.delete(task);
-    taskEventPublisher.publishEvent(
-        com.taskTracker.taskTracker.event.TaskEventType.DELETED, response);
   }
 }

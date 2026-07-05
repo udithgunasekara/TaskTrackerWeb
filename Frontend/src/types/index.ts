@@ -11,5 +11,4 @@ export interface PageResponse<T> {
   content: T[]; page: number; size: number;
   totalElements: number; totalPages: number; last: boolean;
 }
-export interface TaskEvent { type: 'CREATED' | 'UPDATED' | 'DELETED'; task: Task; }
 export interface AuthResponse extends User { token: string; }
