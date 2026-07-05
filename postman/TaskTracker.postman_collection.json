@@ -17,7 +17,7 @@
                 "exec": [
                   "if (pm.response.code === 200) {",
                   "    var json = pm.response.json();",
-                  "    pm.environment.set('token', json.token);",
+                  "    pm.environment.set('token', json.results[0].token);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -50,7 +50,7 @@
                 "exec": [
                   "if (pm.response.code === 200) {",
                   "    var json = pm.response.json();",
-                  "    pm.environment.set('token', json.token);",
+                  "    pm.environment.set('token', json.results[0].token);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -99,9 +99,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 201) {",
+                  "if (pm.response.code === 200) {",
                   "    var json = pm.response.json();",
-                  "    pm.environment.set('taskId', json.id);",
+                  "    pm.environment.set('taskId', json.results[0].id);",
                   "}"
                 ],
                 "type": "text/javascript"

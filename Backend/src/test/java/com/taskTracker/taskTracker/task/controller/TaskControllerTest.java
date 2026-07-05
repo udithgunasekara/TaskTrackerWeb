@@ -1,0 +1,71 @@
+package com.taskTracker.taskTracker.task.controller;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.taskTracker.taskTracker.common.security.JwtAuthenticationFilter;
+import com.taskTracker.taskTracker.common.security.JwtUtil;
+import com.taskTracker.taskTracker.common.security.RestAuthEntryPoint;
+import com.taskTracker.taskTracker.common.support.WithMockCustomUser;
+import com.taskTracker.taskTracker.task.payload.request.TaskRequest;
+import com.taskTracker.taskTracker.task.payload.response.TaskResponse;
+import com.taskTracker.taskTracker.task.service.TaskService;
+import com.taskTracker.taskTracker.task.type.TaskStatus;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.test.web.servlet.MockMvc;
+
+@WebMvcTest(TaskController.class)
+@AutoConfigureMockMvc(addFilters = false) // disables security filters for unit test
+class TaskControllerTest {
+
+  @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
+
+  @MockBean private TaskService taskService;
+  @MockBean private JwtUtil jwtUtil; // in case it's needed by context
+
+  @MockBean private JwtAuthenticationFilter jwtAuthenticationFilter;
+  @MockBean private UserDetailsService userDetailsService;
+  @MockBean private RestAuthEntryPoint restAuthEntryPoint;
+
+  @Test
+  @WithMockCustomUser
+  void createTask_ValidInput_Returns200() throws Exception {
+    TaskRequest request = new TaskRequest("Test Title", "Desc", TaskStatus.TODO, null);
+    TaskResponse response =
+        new TaskResponse(1L, "Test Title", "Desc", TaskStatus.TODO, null, null, null, null);
+
+    when(taskService.createTask(any(TaskRequest.class), any())).thenReturn(response);
+
+    mockMvc
+        .perform(
+            post("/api/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.results[0].title").value("Test Title"));
+  }
+
+  @Test
+  @WithMockCustomUser
+  void createTask_InvalidInput_Returns400() throws Exception {
+    TaskRequest request = new TaskRequest("", "Desc", TaskStatus.TODO, null); // invalid blank title
+
+    mockMvc
+        .perform(
+            post("/api/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest());
+  }
+}
