@@ -10,10 +10,10 @@ import com.taskTracker.taskTracker.repository.TaskRepository;
 import com.taskTracker.taskTracker.repository.UserRepository;
 import com.taskTracker.taskTracker.service.TaskService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -42,10 +42,28 @@ public class TaskServiceImpl implements TaskService {
   }
 
   @Override
-  public PageResponse<TaskResponse> getTasks(Long userId, int page, int size) {
-    Pageable pageable = PageRequest.of(page, size);
+  @Transactional(readOnly = true)
+  public PageResponse<TaskResponse> getTasks(
+      com.taskTracker.taskTracker.entity.TaskStatus status,
+      Long ownerId,
+      Pageable pageable,
+      User currentUser) {
 
-    Specification<Task> spec = (root, query, cb) -> cb.equal(root.get("owner").get("id"), userId);
+    Specification<Task> spec = Specification.where(null);
+
+    // 1. Enforce ownership for non-admins
+    if (currentUser.getRole() != com.taskTracker.taskTracker.entity.Role.ADMIN) {
+      spec =
+          spec.and((root, query, cb) -> cb.equal(root.get("owner").get("id"), currentUser.getId()));
+    } else if (ownerId != null) {
+      // Admin can filter by ownerId
+      spec = spec.and((root, query, cb) -> cb.equal(root.get("owner").get("id"), ownerId));
+    }
+
+    // 2. Filter by status
+    if (status != null) {
+      spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
+    }
 
     Page<Task> taskPage = taskRepository.findAll(spec, pageable);
     Page<TaskResponse> responsePage = taskPage.map(taskMapper::toResponse);

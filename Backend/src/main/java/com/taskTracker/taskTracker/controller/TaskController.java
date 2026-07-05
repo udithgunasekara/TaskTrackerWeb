@@ -29,10 +29,15 @@ public class TaskController {
 
   @GetMapping
   public ResponseEntity<PageResponse<TaskResponse>> getTasks(
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(required = false) com.taskTracker.taskTracker.entity.TaskStatus status,
+      @RequestParam(required = false) Long ownerId,
+      @org.springframework.data.web.PageableDefault(
+              sort = "createdAt",
+              direction = org.springframework.data.domain.Sort.Direction.DESC)
+          org.springframework.data.domain.Pageable pageable,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
-    return ResponseEntity.ok(taskService.getTasks(userDetails.getUser().getId(), page, size));
+    return ResponseEntity.ok(
+        taskService.getTasks(status, ownerId, pageable, userDetails.getUser()));
   }
 
   @PutMapping("/{id}")

@@ -59,4 +59,13 @@ public class JwtUtil {
   private Date extractExpiration(String token) {
     return extractClaim(token, Claims::getExpiration);
   }
+
+  public boolean isValid(String token) {
+    try {
+      Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token);
+      return !isTokenExpired(token);
+    } catch (Exception e) {
+      return false;
+    }
+  }
 }
