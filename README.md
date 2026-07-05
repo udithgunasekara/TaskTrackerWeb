@@ -20,15 +20,12 @@ Task Tracker is a full-stack web application for managing tasks across a team. I
 
 ## Architecture Overview
 
-**Package Layout:**
-- `controller`: REST endpoints
-- `service`: Business logic interfaces and implementations (`impl`)
-- `repository`: Spring Data JPA interfaces
-- `entity`: Database models
-- `dto`: Data Transfer Objects (Requests & Responses)
-- `security`: JWT filters, authentication providers, user details
-- `config`: Beans configuration (Security)
-- `exception`: Global exception handler and custom exceptions
+The backend is organized **package-by-feature** rather than package-by-layer: each business domain owns its full vertical slice (`controller` → `service`/`impl` → `repository` → `model`), with a shared `common` module for identity, security, and cross-cutting infrastructure.
+
+- `common`: shared identity/auth — `config` (security, CORS, JPA auditing, admin seeding), `constant` (message-code enums), `controller` (`AuthController`), `exception` (`ModuleException`, `EntityNotFoundException`, `GlobalExceptionHandler`), `mapper`, `model` (`User`), `payload/{request,response}`, `repository` (`UserDao`), `security` (JWT filter, user details, entry point), `service`/`impl` (`AuthService`), `type` (`Role`)
+- `task`: the Task feature — same shape (`constant`, `controller`, `mapper`, `model`, `payload`, `repository`, `service`/`impl`, `type`) scoped to `Task`
+
+**Response envelope:** every endpoint returns `{ "status": "successful" | "unsuccessful", "results": [...] }`. Controllers wrap a service's typed return value at the HTTP boundary (`new ResponseEntityDto(false, data)`); services themselves keep returning plain typed DTOs, preserving unit-testability.
 
 **Request Flow:**  
 `Client` → `Controller` → `Service` → `Repository` → `MySQL`
