@@ -1,7 +1,5 @@
 # Task Tracker
 
-![CI](https://github.com/udithgunasekara/TaskTrackerWeb/actions/workflows/ci.yml/badge.svg)
-
 Task Tracker is a full-stack web application for managing tasks across a team. It provides robust JWT-based authentication and Role-Based Access Control (RBAC), with a React frontend that keeps the task list in sync after every change.
 
 ## Tech Stack
