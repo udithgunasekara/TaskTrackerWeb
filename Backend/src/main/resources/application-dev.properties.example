@@ -1,0 +1,12 @@
+spring.datasource.url=jdbc:mysql://127.0.0.1:3306/tasktracker?createDatabaseIfNotExist=true
+spring.datasource.username=root
+spring.datasource.password=root
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+app.jwt.secret=dev-only-secret-please-change-0123456789abcdef0123456789abcdef
+app.jwt.expiration-ms=86400000
+app.cors.allowed-origins=http://localhost:5173
+app.admin.email=admin@tasktracker.local
+app.admin.password=Admin@12345
+app.admin.full-name=System Admin
