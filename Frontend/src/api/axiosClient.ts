@@ -20,8 +20,18 @@ axiosClient.interceptors.request.use(
 );
 
 axiosClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const body = response.data;
+    if (body && Array.isArray(body.results)) {
+      response.data = body.results[0];
+    }
+    return response;
+  },
   (error) => {
+    const body = error.response?.data;
+    if (body && Array.isArray(body.results)) {
+      error.response.data = body.results[0];
+    }
     if (error.response?.status === 401) {
       useAuthStore.getState().logout();
       window.location.href = '/login';

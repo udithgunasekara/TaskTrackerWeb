@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, LoginFormValues } from '../lib/schemas';
+import { loginSchema } from '../lib/schemas';
+import type { LoginFormValues } from '../lib/schemas';
 import { login as loginApi } from '../api/authApi';
 import { useAuthStore } from '../stores/authStore';
 

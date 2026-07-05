@@ -11,5 +11,13 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Required'),
 });
 
+export const taskSchema = z.object({
+  title: z.string().min(1, 'Required').max(150, 'Max 150 characters'),
+  description: z.string().max(2000, 'Max 2000 characters').optional().nullable(),
+  status: z.enum(['TODO', 'IN_PROGRESS', 'DONE']),
+  dueDate: z.string().optional().nullable(),
+});
+
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 export type LoginFormValues = z.infer<typeof loginSchema>;
+export type TaskFormValues = z.infer<typeof taskSchema>;

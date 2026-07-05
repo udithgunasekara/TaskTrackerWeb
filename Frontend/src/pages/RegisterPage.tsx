@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { registerSchema, RegisterFormValues } from '../lib/schemas';
+import { registerSchema } from '../lib/schemas';
+import type { RegisterFormValues } from '../lib/schemas';
 import { register as registerApi } from '../api/authApi';
 import { useAuthStore } from '../stores/authStore';
 
